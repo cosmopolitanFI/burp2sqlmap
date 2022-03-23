@@ -28,7 +28,7 @@ def run_sqlmap(requests):
       f.write(request)
     
 
-    alert = "echo {} >> vulnerable.log".format(req_idd)
+    alert = "echo {} >> vulnerable.log".format(req_id)
     command = ["sqlmap","-r","requests/{}".format(req_id),
                "--random-agent", "--threads=10", "--batch", "--flush-session",
                "--answer='redirect=N'","--risk=3","--level=5","--alert={}".format(alert)]
