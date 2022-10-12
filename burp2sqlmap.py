@@ -1,9 +1,12 @@
 #!/usr/bin/python3
-import subprocess, sys
-from bs4 import BeautifulSoup
 import os
+import sys
 import uuid
 import base64
+import shutil
+import subprocess
+
+from bs4 import BeautifulSoup
 
 def read_burp(file):
   if os.path.isfile(file):
@@ -33,10 +36,13 @@ def run_sqlmap(requests):
                "--answer='redirect=N'","--force-ssl","--proxy=http://localhost:8080/","--alert={}".format(alert)]
     subprocess.run(command)
 
+
 if __name__ == "__main__":
   try:
     burp_file = sys.argv[1]
     requests = read_burp(burp_file)
+    if os.path.exists("requests"):
+      shutil.rmtree("requests")
     os.makedirs("requests/", exist_ok=True)
     run_sqlmap(requests)
 
