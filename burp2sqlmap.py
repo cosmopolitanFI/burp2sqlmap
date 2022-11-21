@@ -19,7 +19,10 @@ def read_burp(file):
   else:
     print("File does not exist")
 
+
 def run_sqlmap(requests):
+  level = int(input("Intensity level (1-5): "))
+  risk = int(input("Risk level (1-3): "))
   for req in requests:
     request = base64.b64decode(req.contents[0])
 
@@ -31,7 +34,7 @@ def run_sqlmap(requests):
       f.write(request)
 
     alert = "echo {} >> vulnerable.log".format(req_id)
-    command = ["sqlmap","-r","requests/{}".format(req_id),
+    command = ["sqlmap","-r","requests/{}".format(req_id), "--level={}".format(level), "--risk={}".format(risk),
                "--random-agent", "--threads=10", "--batch", "--flush-session",
                "--answer='redirect=N'","--force-ssl","--proxy=http://localhost:8080/","--alert={}".format(alert)]
     subprocess.run(command)
