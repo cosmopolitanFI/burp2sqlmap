@@ -24,8 +24,8 @@ def update_log(file):
   read_log = []
   with open("requests/log.txt", "r") as f:
     for line in f.readlines():
-      if file == line.strip():
-        line.replace("WAIT", "DONE")
+      if file in line:
+        line = line.replace("WAIT", "DONE")
       read_log.append(line)
 
   with open("requests/log.txt", "w+") as f:
@@ -36,7 +36,7 @@ def run_sqlmap(files, args):
   for file in files:
     if "WAIT" in file:
       filename = file.split(" ")[0]
-      alert = "echo {} >> vulnerable.log".format(filename)
+      alert = "'echo {} >> vulnerable.log'".format(filename)
       command = ["sqlmap","-r","requests/{}".format(filename), \
                  "--level={}".format(args.intensity), \
                  "--risk={}".format(args.risk),
@@ -57,7 +57,7 @@ def store_requests(requests):
   files = []
   with open("requests/log.txt", "w+") as log:
     for request in requests:
-      request = base64.b64decode(req.contents[0])
+      request = base64.b64decode(request.contents[0])
       
       # Write request to file
       req_id = uuid.uuid4().hex
@@ -65,6 +65,7 @@ def store_requests(requests):
       with open(file, "wb+") as f:
         f.write(request)
       file += " -- WAIT\n"
+      file = file.replace("requests/","")
       log.write(file) # keep track of file names
       files.append(file.strip()) # Store file names to list
   return files
@@ -90,13 +91,12 @@ if __name__ == "__main__":
   try:
     burp_file = args.requests
     requests = read_burp(burp_file)
-    if args.new:
+    if args.new != "False":
       files = store_requests(requests)
     else:
       files = read_log()
     run_sqlmap(files, args)
 
   except Exception as e:
-    print("Error! - Example")
-    print("python3 burp2sqlmap.py BURPFILE")
+    print("Error! - do help")
     print(e)
